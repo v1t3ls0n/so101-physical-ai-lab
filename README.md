@@ -41,9 +41,9 @@ Held-out action error (mean absolute error in degrees over two demonstrations th
 |---|---|---|
 | ACT v1 | 12 episodes, batch 4, 30k steps | 13.6 |
 | SmolVLA | 12 episodes, expert only, 20k steps | 12.0 |
-| ACT v2 | 24 episodes, batch 8, 25k steps (still training) | 12.2 |
+| ACT v2 | 24 episodes, batch 8, 30k steps | 12.2 |
 
-Doubling the demonstrations cut ACT's error by about 10 % at the same step and moved its whole curve ahead of v1 by roughly 10k steps.
+Doubling the demonstrations cut ACT's final error from 13.6 to 12.2 and moved its whole curve ahead of v1 by roughly 10k steps; v2 plateaus from 25k steps, where SmolVLA plateaued from 10k.
 
 On the arm, the first checkpoints reach the ball and hover beside it without closing the grasp. The rollout below is ACT after 15k steps on the 12-episode set: a full reach, then a hover. Closing the grasp is the current iteration: more demonstrations of the descend-and-close phase, and the v2 checkpoints.
 
