@@ -153,7 +153,7 @@ On the arm, v1 reached the ball and hovered beside it. v2 reaches and descends o
 
 ![ACT-15000 closed-loop rollout on the arm](assets/rollout_act15k.gif)
 
-🎮 **Sim-to-real.** The same task in Isaac Lab on NVIDIA's Sim-to-Real SO-101 workshop scene, with the workshop's vials and rack swapped for this rig's ball and red box. The environment steps headless with both cameras rendering (20 steps in 1.2 s on an RTX 2080) and ends the episode when the ball is inside the box.
+🎮 **Sim-to-real.** The same task in Isaac Lab on NVIDIA's Sim-to-Real SO-101 workshop scene, with the workshop's vials and rack swapped for this rig's single ping-pong ball, in one of three colours drawn at random on every reset. The environment steps headless with both cameras rendering (20 steps in 1.2 s on an RTX 2080) and ends the episode when the ball is lifted off the mat; a variant keeps the red box as the target.
 
 ![Isaac Lab: the ball task on the workshop scene](assets/isaac_pick_ball.png)
 
