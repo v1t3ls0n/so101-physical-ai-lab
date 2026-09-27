@@ -76,6 +76,12 @@ The SO-101 is the first body. A Universal Robots arm is the second. The directio
 
 🛑 **Operating it.** Password login over Tailscale, a viewer account that watches and drives nothing, one device holding the arm at a time with takeover, an E-STOP under everything including a hardware button on a header pin, a server that stops what needs a person 60 s after your tab closes. A journal, a dashboard, a pre-flight where every failure comes with its remedy, wear and energy per joint across restarts, servo health run by run, a scrubber through any run on one clock, search across runs and notes, webhooks to Slack, Telegram or Home Assistant, a gamepad and keyboard jog through the same clamp, several rigs on one dashboard, battery and UPS awareness. Hebrew right to left with the page mirrored. `docker compose up` runs the whole system on any laptop with a simulated servo bus. Tagged releases with checksummed archives and container images. A service worker that survives the server going away.
 
+🧭 **Perception and grasping in the arm's frame.** The cameras place what is on the table in millimetres from the arm's base (a depth camera through a calibration solved with a ball in the jaws, the scene camera through its solved pose); a grasp is planned across the object's narrow side and reached by inverse kinematics; a learned policy can take the last centimetres, with the geometric grasp as the fallback. An open-vocabulary detector finds things by name ("the cup") in 0.2 s on the Jetson. Claude plans with these as tools: perceive, pick, check.
+
+🤖 **It records its own demonstrations.** A scripted demonstrator plans each grasp from the scene camera, servos the ball to the jaws in the wrist picture on the way down, and keeps a take only when a verifier says the ball left the table in the jaws. It took 9 of 10 on the real arm.
+
+🎯 **Reinforcement learning with a human hand.** HIL-SERL with the grasp verifier as the reward and the leader arm as the intervening hand, a space-bar clutch deciding who has the arm; the learner runs on a desktop GPU over the tailnet.
+
 🦾 **A second body.** A Universal Robots arm over its IP: power, brakes, joints and tool position, clamped URScript, and the operator model with its own tool set. The skills library idea carries over.
 
 ---
@@ -111,12 +117,12 @@ Three models, three jobs: Claude operates (slow, careful, expensive by design), 
 
 | | |
 |---|---|
-| Python | ~97,000 lines across ~395 modules, typed and checked (mypy, ruff) |
-| Browser | ~14,700 lines of plain JavaScript, one page anatomy, dark and light, English and Hebrew RTL |
-| API | 711 routes on one FastAPI process, 19 pages, a generated SDK and an OpenAPI description |
-| Tests | over 2,400 unit, end-to-end and browser (Playwright) tests; a container job; a conftest that refuses to open a real camera or cut torque |
-| Docs | a 20-document handbook plus a 34-chapter guide served inside the app; a changelog of 72 released versions |
-| Bodies | two SO-101 arms on a Jetson Orin Nano (ROS 2 Jazzy), a Universal Robots arm over IP, a MuJoCo twin, Isaac Sim / Isaac Lab on a remote GPU |
+| Python | ~106,000 lines across ~440 modules, typed and checked (mypy, ruff) |
+| Browser | ~15,000 lines of plain JavaScript, one page anatomy, dark and light, English and Hebrew RTL |
+| API | 714 routes on one FastAPI process, 18 pages, a generated SDK and an OpenAPI description |
+| Tests | over 4,200 test functions across 225 files — unit, end-to-end and browser (Playwright) — with a conftest that refuses to open a real camera or cut torque |
+| Docs | a handbook plus a 33-chapter guide in English and Hebrew served inside the app; a changelog of 76 versions |
+| Bodies | two SO-101 arms on a Jetson Orin Nano (ROS 2 Jazzy), a Universal Robots arm over IP, a MuJoCo twin, Isaac Sim / Isaac Lab and training on a desktop RTX GPU |
 
 ---
 
@@ -153,6 +159,20 @@ On the arm, v1 reached the ball and hovered beside it. v2 reaches and descends o
 
 ![ACT-15000 closed-loop rollout on the arm](assets/rollout_act15k.gif)
 
+**September: a month of real data, and what it taught.** 41 human demonstrations and 14 scripted ones later, the picture is sharper:
+
+| Run | Data | On the arm |
+|---|---|---|
+| ACT v6 | 17 takes in the current camera framing (7 human, 10 scripted) | reaches the zone, comes down 10 cm short of the ball and hovers, wherever the ball is — for 45 s or 60 s alike |
+| SmolVLA v3 | the same takes | too slow on the Jetson (~1 s per look): a few seconds of actions in 45 s |
+| Scripted demonstrator | geometry, no learning | 9 of 10 grasps |
+
+![ACT v6 on the arm: it comes down beside the ball and waits](assets/rollout_actv6_hover.gif)
+
+Two lessons. **A camera that moves is a new dataset:** a knocked scene camera cost a model ~11 points of held-out error, so datasets are now kept per framing. **Whole-task policies learn the average reach, not the ball's position.** The architecture that follows splits the work by distance: perception and inverse kinematics bring the jaws over the object exactly, a policy trained only on the final descents does the contact, the verifier decides, and the geometric grasp takes over on a miss. The scripted demonstrator below is that geometry alone, recording its own verified takes (scene camera left, wrist camera right):
+
+![A take the scripted demonstrator recorded by itself](assets/scripted_take.gif)
+
 🎮 **Sim-to-real.** The same task in Isaac Lab on NVIDIA's Sim-to-Real SO-101 workshop scene, with the workshop's vials and rack swapped for this rig's single ping-pong ball, in one of three colours drawn at random on every reset. The environment steps headless with both cameras rendering (20 steps in 1.2 s on an RTX 2080) and ends the episode when the ball is lifted off the mat; a variant keeps the red box as the target.
 
 ![Isaac Lab: the ball task on the workshop scene](assets/isaac_pick_ball.png)
@@ -163,7 +183,11 @@ On the arm, v1 reached the ball and hovered beside it. v2 reaches and descends o
 
 ## 🔭 Where it is going
 
-Any LeRobot robot behind the same driver: the primitives and limits are the contract, so a mobile base or a humanoid's limbs slot under the same agent, chat and skills. Corrections folded into the next fine-tune from the page. Self-verification: Claude scoring skill outcomes from the cameras and proposing which demonstrations are missing, with the person still at the leader arm and still approving. Evaluations in Langfuse: success rates, cost per task, regressions between checkpoints. A policy runtime at rate with TensorRT. A fleet: several robots, one chat, one journal.
+**At the bench next:** the depth camera mounted and calibrated to the arm; the finishing policy on the arm against the geometric grasp on the same placements; the first HIL-SERL session with a hand on the clutch.
+
+**Improve-100:** a hundred improvements being built now — data that stays clean (a camera-framing fingerprint on every take, the waits cut out, positions held out instead of episodes), policies that know where the target is (its position and a crop around it as inputs, frozen foundation-model encoders, point-cloud and keypoint policies, residual and offline RL), control that respects the servos (minimum-jerk trajectories, gravity compensation, a force-limited close, collision checks and light motion planning), planning that checks itself (Claude perceiving after every step, behaviour trees, rehearsal in the physics twin), and operations that run overnight.
+
+**Bodies:** any LeRobot robot behind the same driver through one hardware-abstraction interface; bimanual skills after that.
 
 ---
 
@@ -175,7 +199,7 @@ Python · FastAPI · PyTorch · LeRobot · ROS 2 Jazzy · Claude (operator and c
 
 ## 🕰️ History
 
-It began as a guided calibration tool, because the stock calibration accepted a broken calibration silently, so teleop tracked wrong. From there it grew a web interface, a 3D twin of the real CAD, recording and training with a quality gate, then Claude as an operator model with a limit-enforcing driver, skills, cameras by role, a voice in and a voice out, one chat thread, traces, a second body, and the research loop above.
+It began as a guided calibration tool, because the stock calibration accepted a broken calibration silently, so teleop tracked wrong. From there it grew a web interface, a 3D twin of the real CAD, recording and training with a quality gate, then Claude as an operator model with a limit-enforcing driver, skills, cameras by role, a voice in and a voice out, one chat thread, traces, a second body, and the research loop above. September 2026 was the month of real data: the first policies trained on a desktop GPU and run on the arm, the discovery that they hover beside the ball, a scripted demonstrator that took nine of ten, and the perception-first architecture that came out of both.
 
 ---
 
