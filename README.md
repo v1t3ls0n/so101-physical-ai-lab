@@ -78,7 +78,7 @@ The SO-101 is the first body. A Universal Robots arm is the second. The directio
 
 🧭 **Perception and grasping in the arm's frame.** The cameras place what is on the table in millimetres from the arm's base (a depth camera through a calibration solved with a ball in the jaws, the scene camera through its solved pose); a grasp is planned across the object's narrow side and reached by inverse kinematics; a learned policy can take the last centimetres, with the geometric grasp as the fallback. An open-vocabulary detector finds things by name ("the cup") in 0.2 s on the Jetson. Claude plans with these as tools: perceive, pick, check.
 
-🤖 **It records its own demonstrations.** A scripted demonstrator plans each grasp from the scene camera, servos the ball to the jaws in the wrist picture on the way down, and keeps a take only when a verifier says the ball left the table in the jaws. It took 9 of 10 on the real arm.
+🤖 **It records its own demonstrations.** A scripted demonstrator plans each grasp from the scene camera, servos the ball to the jaws in the wrist picture on the way down, and keeps a take only when a verifier says the ball left the table in the jaws. It took 9 of 10 on the real arm, and as a supervised data factory it kept 5 of 7 takes in its first clean run, dropping the still frames as it records so the descents carry no pause.
 
 🎯 **Reinforcement learning with a human hand.** HIL-SERL with the grasp verifier as the reward and the leader arm as the intervening hand, a space-bar clutch deciding who has the arm; the learner runs on a desktop GPU over the tailnet.
 
@@ -175,6 +175,8 @@ On the arm, v1 reached the ball and hovered beside it. v2 reaches and descends o
 | ACT v6 | 17 takes in the current camera framing (7 human, 10 scripted) | reaches the zone, comes down 10 cm short of the ball and hovers, wherever the ball is — for 45 s or 60 s alike |
 | SmolVLA v3 | the same takes | too slow on the Jetson (~1 s per look): a few seconds of actions in 45 s |
 | Scripted demonstrator | geometry, no learning | 9 of 10 grasps |
+| Finishing policy (ACT, 19 final-descent segments) | inverse kinematics to the hover, the policy for the last centimetres | handed the arm 20 mm above where its takes began, it closed on nothing; the geometric grasp behind it took the ball 3 of 3 — it now takes over at its takes' own start height |
+| Scripted factory | the demonstrator recording its own takes, supervised | 5 of 7 kept, no faults, live camera throughout |
 
 ![ACT v6 on the arm: it comes down beside the ball and waits](assets/rollout_actv6_hover.gif)
 
@@ -192,7 +194,7 @@ Two lessons. **A camera that moves is a new dataset:** a knocked scene camera co
 
 ## 🔭 Where it is going
 
-**At the bench next:** the base is clamped now, so first the finishing policy on the arm (the wrist roll held over a round ball) against the geometric grasp on the same placements; then the depth camera mounted and calibrated to the arm, the first HIL-SERL session with a hand on the clutch, and the first overnight run of the scripted factory.
+**At the bench next:** a finishing policy trained on the factory's own descents, then head to head with the geometric grasp on the same placements; the scene camera's pose solved from AprilTags so the table map stops extrapolating; the depth camera mounted and calibrated to the arm; the first HIL-SERL session with a hand on the clutch; and the factory's first night.
 
 **Improve-100, on the arm:** all hundred are built and tested in software; the ones that touch hardware (the depth camera's grasping and kinematic correction, the tilt sensor, the leader's haptics, nightly trials on the arm, the VLA served from the desktop GPU) now each need their first real run.
 
