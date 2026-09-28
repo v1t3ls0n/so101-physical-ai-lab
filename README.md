@@ -190,6 +190,16 @@ Two lessons. **A camera that moves is a new dataset:** a knocked scene camera co
 
 🧪 **What the first real checkpoints taught.** Since LeRobot 0.4, normalisation, camera renames, batching and tokenising live in the checkpoint's processor pipelines, not in the policy; every in-app runner had met fakes only, and wrapping the policy in its own pre/post-processors fixed inference everywhere at once. Evaluating with a stride desynchronised a chunked policy's action queue; resetting before every sampled frame halved the measured error. A servo's alarm bit kills a recording at the worst moment; the recorder now names the arm, the phase and what to check. A VLA on the Jetson takes ~1.4 s per look; real-time chunking and a remote policy server are what make it usable in a 30 s episode.
 
+🧠 **The adaptive layer, on the real arm.** The neuromorphic layer beside the driver (a NEF population that learns each pose's sag from every landing) had only been measured on a loaded fake arm, where it landed three times closer than the lookup table alone. Its protocol on the real follower: twenty poses across the reach, three rounds each, with the layer off, then on and learning, then frozen. Mean absolute first landing, before any correction:
+
+| Pass | Mean | Pan | Lift | Elbow | Wrist | Corrections |
+|---|---:|---:|---:|---:|---:|---:|
+| off | 0.54° | 0.73° | 0.83° | 0.45° | 0.16° | 41 |
+| on, learning | 0.48° | 0.60° | 0.84° | 0.32° | 0.16° | 38 |
+| frozen | 0.44° | 0.62° | 0.80° | 0.23° | 0.12° | 25 |
+
+The claim holds by the protocol's own test, but the gain is modest: this follower already lands within half a degree, the elbow halved and the shoulder lift did not move. One session with the passes in a fixed order can't separate learning from servos warming up; the repeat turns the order round. Running it at all took three fixes the fake arm never needed: the layer's switch and the first-landing error carried over the ROS graph, the poses chosen with the arm's mirrored joint directions (a pose "80 mm up" was 25 mm under the table), and every approach started from home instead of rest (a straight line out of the folded rest pose went through the table).
+
 ---
 
 ## 🔭 Where it is going
