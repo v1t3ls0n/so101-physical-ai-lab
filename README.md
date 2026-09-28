@@ -200,6 +200,8 @@ Two lessons. **A camera that moves is a new dataset:** a knocked scene camera co
 
 The claim holds by the protocol's own test, but the gain is modest: this follower already lands within half a degree, the elbow halved and the shoulder lift did not move. One session with the passes in a fixed order can't separate learning from servos warming up; the repeat turns the order round. Running it at all took three fixes the fake arm never needed: the layer's switch and the first-landing error carried over the ROS graph, the poses chosen with the arm's mirrored joint directions (a pose "80 mm up" was 25 mm under the table), and every approach started from home instead of rest (a straight line out of the folded rest pose went through the table).
 
+👁️ **An event retina from ordinary webcams.** Neuromorphic vision sends change, not frames: a pixel fires when its light moves by a step, and is silent otherwise. The platform emulates that from its webcams (per-pixel log-brightness steps, a lin-log floor so noise in dark areas stays quiet). Two first uses: the grasp now *feels a touch*, where a free ball that moves in its box while the arm stands still was brushed, and the jaws don't close on where it was; and a camera can stream as changes only, a key frame every few seconds and between them only the tiles that fired. On a still table that is 6.4 KB/s instead of 87 KB/s. A real event sensor (a GenX320 on the Raspberry Pi 5) would add microsecond latency and a wide dynamic range on top.
+
 ---
 
 ## 🔭 Where it is going
