@@ -16,8 +16,8 @@ Two SO-101 arms · a Jetson Orin Nano · LeRobot underneath · your browser anyw
 ![mujoco](https://img.shields.io/badge/MuJoCo-physics%20twin-0B7285)
 ![isaac](https://img.shields.io/badge/Isaac%20Sim-sim--to--real-76B900?logo=nvidia&logoColor=white)
 ![langfuse](https://img.shields.io/badge/Langfuse-traced-1f6feb)
-![tests](https://img.shields.io/badge/tests-2400%2B%20unit%20%C2%B7%20e2e%20%C2%B7%20browser-brightgreen)
-![i18n](https://img.shields.io/badge/i18n-English%20%C2%B7%20%D7%A2%D7%91%D7%A8%D7%99%D7%AA-8250df)
+![tests](https://img.shields.io/badge/tests-5600%2B%20unit%20%C2%B7%20e2e%20%C2%B7%20ROS-brightgreen)
+![voice](https://img.shields.io/badge/voice-English%20%C2%B7%20%D7%A2%D7%91%D7%A8%D7%99%D7%AA-8250df)
 
 A platform for operating, teaching and researching robot arms.<br/>
 This repository is the public write-up; the code base is private, and I am happy to walk through it on request.
@@ -74,7 +74,7 @@ The SO-101 is the first body. A Universal Robots arm is the second. The directio
 
 🦿 **Body and senses.** A live 3D twin of the real arm from the official CAD, posed by the joint stream in your browser. A MuJoCo physics twin that rehearses a pose before the arm moves, finds a way round an obstacle, checks whether a grasp would hold, ranks a skill or a checkpoint on placements the recording never had, and writes simulated episodes as datasets. Calibration that cannot save garbage: from the rest pose, one joint at a time, the encoder unwrapped across its seam, every range judged against the CAD's travel. A twin check that photographs the arm in known poses and has Claude compare photo and drawing joint by joint. Cameras by name, USB and CSI, a depth camera whose stream lands in the dataset and judges the task from geometry alone, and an optional ONNX detector that names what the cameras see.
 
-🛑 **Operating it.** Password login over Tailscale, a viewer account that watches and drives nothing, one device holding the arm at a time with takeover, an E-STOP under everything including a hardware button on a header pin, a server that stops what needs a person 60 s after your tab closes. A journal, a dashboard, a pre-flight where every failure comes with its remedy, wear and energy per joint across restarts, servo health run by run, a scrubber through any run on one clock, search across runs and notes, webhooks to Slack, Telegram or Home Assistant, a gamepad and keyboard jog through the same clamp, several rigs on one dashboard, battery and UPS awareness. Hebrew right to left with the page mirrored. `docker compose up` runs the whole system on any laptop with a simulated servo bus. Tagged releases with checksummed archives and container images. A service worker that survives the server going away.
+🛑 **Operating it.** Password login over Tailscale, a viewer account that watches and drives nothing, one device holding the arm at a time with takeover, an E-STOP under everything including a hardware button on a header pin, a server that stops what needs a person 60 s after your tab closes. A journal, a dashboard, a pre-flight where every failure comes with its remedy, wear and energy per joint across restarts, servo health run by run, a scrubber through any run on one clock, search across runs and notes, webhooks to Slack, Telegram or Home Assistant, a gamepad and keyboard jog through the same clamp, several rigs on one dashboard, battery and UPS awareness. A phone page with the E-STOP first and both cameras live, and push notifications when training ends, a run finishes or the arm faults. `docker compose up` runs the whole system on any laptop with a simulated servo bus. Tagged releases with checksummed archives and container images. A service worker that survives the server going away.
 
 🧭 **Perception and grasping in the arm's frame.** The cameras place what is on the table in millimetres from the arm's base (a depth camera through a calibration solved with a ball in the jaws, the scene camera through its solved pose); a grasp is planned across the object's narrow side and reached by inverse kinematics; a learned policy can take the last centimetres, with the geometric grasp as the fallback. An open-vocabulary detector finds things by name ("the cup") in 0.2 s on the Jetson. Claude plans with these as tools: perceive, pick, check.
 
@@ -83,6 +83,15 @@ The SO-101 is the first body. A Universal Robots arm is the second. The directio
 🎯 **Reinforcement learning with a human hand.** HIL-SERL with the grasp verifier as the reward and the leader arm as the intervening hand, a space-bar clutch deciding who has the arm; the learner runs on a desktop GPU over the tailnet.
 
 🦾 **A second body.** A Universal Robots arm over its IP: power, brakes, joints and tool position, clamped URScript, and the operator model with its own tool set. The skills library idea carries over.
+
+📈 **A hundred improvements in one round (improve-100).** Ten themed batches, one issue per item, all built and tested in software:
+- **Data:** every take tagged with its camera framing, the human's hovers stripped out, positions held out instead of episodes, failures kept, a stricter gate, a coverage grid that asks for takes where the error is highest.
+- **Policies:** the target's position and crops around it as inputs, relative actions, frozen DINOv2/SigLIP features, phase policies chained approach → descend → grasp → lift, sim-and-real co-training, TensorRT FP16 on the Orin, depth, point-cloud and keypoint policies.
+- **RL and evaluation:** takeovers become corrective data, residual RL over ACT, offline IQL over every take, a reset curriculum, checkpoints that disagree handing the grasp to geometry, nightly train-score-promote, and A/B trials that stop when the statistics say enough.
+- **Perception and grasping:** hand-eye and checkerboard calibration, AprilTags with drift alarms, tracking and memory through occlusion, touch-to-select and pointing, grasp scoring on depth, place planning, a camera-fitted correction of the kinematics, success predicted before the lift, regrasps, push, slide and pour.
+- **Control:** one minimum-jerk trajectory generator, a force-limited close, gravity feedforward, a collision model with a sampling planner, backlash compensation, overloads predicted before they trip.
+- **Unattended nights:** an overnight scripted data factory, a tilt sensor on the base that presses the E-STOP, a depth fence, overload recovery on the tripped servo alone, wear per servo with a replacement schedule, and a live camera picture through every recording, rollout and RL run.
+- **Planning and operations:** Claude re-perceiving after every step, behaviour trees, plans rehearsed in the physics twin, one trace per task with replay, a VLA served from the desktop GPU with real-time chunking, a run registry comparing experiments, an arm plugin layer.
 
 ---
 
@@ -117,11 +126,11 @@ Three models, three jobs: Claude operates (slow, careful, expensive by design), 
 
 | | |
 |---|---|
-| Python | ~106,000 lines across ~440 modules, typed and checked (mypy, ruff) |
-| Browser | ~15,000 lines of plain JavaScript, one page anatomy, dark and light, English and Hebrew RTL |
-| API | 714 routes on one FastAPI process, 18 pages, a generated SDK and an OpenAPI description |
-| Tests | over 4,200 test functions across 225 files — unit, end-to-end and browser (Playwright) — with a conftest that refuses to open a real camera or cut torque |
-| Docs | a handbook plus a 33-chapter guide in English and Hebrew served inside the app; a changelog of 76 versions |
+| Python | ~131,000 lines across ~530 modules, typed and checked (mypy, ruff; strict on the core) |
+| Browser | ~15,500 lines of plain JavaScript, one page anatomy, dark and light, a phone page |
+| API | 772 routes on one FastAPI process, 19 pages, a generated SDK and an OpenAPI description |
+| Tests | 5,617 unit tests across 280 files, 148 end-to-end and browser (Playwright), 65 ROS 2 node tests — with a conftest that refuses to open a real camera or cut torque |
+| Docs | a handbook plus a 33-chapter guide served inside the app; a changelog of 76 versions |
 | Bodies | two SO-101 arms on a Jetson Orin Nano (ROS 2 Jazzy), a Universal Robots arm over IP, a MuJoCo twin, Isaac Sim / Isaac Lab and training on a desktop RTX GPU |
 
 ---
@@ -183,9 +192,9 @@ Two lessons. **A camera that moves is a new dataset:** a knocked scene camera co
 
 ## 🔭 Where it is going
 
-**At the bench next:** the depth camera mounted and calibrated to the arm; the finishing policy on the arm against the geometric grasp on the same placements; the first HIL-SERL session with a hand on the clutch.
+**At the bench next:** the base is clamped now, so first the finishing policy on the arm (the wrist roll held over a round ball) against the geometric grasp on the same placements; then the depth camera mounted and calibrated to the arm, the first HIL-SERL session with a hand on the clutch, and the first overnight run of the scripted factory.
 
-**Improve-100:** a hundred improvements being built now — data that stays clean (a camera-framing fingerprint on every take, the waits cut out, positions held out instead of episodes), policies that know where the target is (its position and a crop around it as inputs, frozen foundation-model encoders, point-cloud and keypoint policies, residual and offline RL), control that respects the servos (minimum-jerk trajectories, gravity compensation, a force-limited close, collision checks and light motion planning), planning that checks itself (Claude perceiving after every step, behaviour trees, rehearsal in the physics twin), and operations that run overnight.
+**Improve-100, on the arm:** all hundred are built and tested in software; the ones that touch hardware (the depth camera's grasping and kinematic correction, the tilt sensor, the leader's haptics, nightly trials on the arm, the VLA served from the desktop GPU) now each need their first real run.
 
 **Bodies:** any LeRobot robot behind the same driver through one hardware-abstraction interface; bimanual skills after that.
 
