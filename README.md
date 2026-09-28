@@ -126,10 +126,10 @@ Three models, three jobs: Claude operates (slow, careful, expensive by design), 
 
 | | |
 |---|---|
-| Python | ~131,000 lines across ~530 modules, typed and checked (mypy, ruff; strict on the core) |
-| Browser | ~15,500 lines of plain JavaScript, one page anatomy, dark and light, a phone page |
-| API | 772 routes on one FastAPI process, 19 pages, a generated SDK and an OpenAPI description |
-| Tests | 5,617 unit tests across 280 files, 148 end-to-end and browser (Playwright), 65 ROS 2 node tests — with a conftest that refuses to open a real camera or cut torque |
+| Python | ~141,000 lines across ~550 modules plus ~76,000 lines of tests, typed and checked (mypy, ruff; strict on the core) |
+| Browser | ~15,700 lines of plain JavaScript, one page anatomy, dark and light, a phone page |
+| API | 775 routes on one FastAPI process, 19 pages, a generated SDK and an OpenAPI description |
+| Tests | 5,881 unit tests, 148 end-to-end and browser (Playwright), 70 ROS 2 node tests — with a conftest that refuses to open a real camera or cut torque |
 | Docs | a handbook plus a 33-chapter guide served inside the app; a changelog of 76 versions |
 | Bodies | two SO-101 arms on a Jetson Orin Nano (ROS 2 Jazzy), a Universal Robots arm over IP, a MuJoCo twin, Isaac Sim / Isaac Lab and training on a desktop RTX GPU |
 
