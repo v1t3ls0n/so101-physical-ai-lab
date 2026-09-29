@@ -132,6 +132,7 @@ Three models, three jobs: Claude operates (slow, careful, expensive by design), 
 | Tests | 5,881 unit tests, 148 end-to-end and browser (Playwright), 70 ROS 2 node tests — with a conftest that refuses to open a real camera or cut torque |
 | Docs | a handbook plus a 33-chapter guide served inside the app; a changelog of 76 versions |
 | Bodies | two SO-101 arms on a Jetson Orin Nano (ROS 2 Jazzy), a Universal Robots arm over IP, a MuJoCo twin, Isaac Sim / Isaac Lab and training on a desktop RTX GPU |
+| Setup | one command takes a freshly flashed Jetson (JetPack 7.2) to the whole stack — CUDA, ROS 2, a pinned GPU venv, the dev tools, the service — in resumable stages ending in a checked report |
 
 ---
 
