@@ -206,11 +206,11 @@ The claim holds by the protocol's own test, but the gain is modest: this followe
 
 ## 🔭 Where it is going
 
-**At the bench next:** a finishing policy trained on the factory's own descents, then head to head with the geometric grasp on the same placements; the scene camera's pose solved from AprilTags so the table map stops extrapolating; the depth camera mounted and calibrated to the arm; the first HIL-SERL session with a hand on the clutch; and the factory's first night.
+**At the bench next:** a fixed camera's pose solved from the jaws moving (no ball, no tags) and the wrist camera's from an AprilTag sheet, then the table placed from a wrist survey pose instead of a fixed camera's picture; a whole-task policy trained only on the scripted demonstrator's takes (held-out error 2.6° against 13.9° for the earlier model — on its own kind of takes, so the arm decides); crowded balls pushed apart inside their box before a grasp; every move checked by the event camera — did the arm go where it was told, and how long it took to start; the depth camera overhead and a 90°+120° stereo pair on the wrist (a printed mount, drafted); the first HIL-SERL session with a hand on the clutch.
 
 **Improve-100, on the arm:** all hundred are built and tested in software; the ones that touch hardware (the depth camera's grasping and kinematic correction, the tilt sensor, the leader's haptics, nightly trials on the arm, the VLA served from the desktop GPU) now each need their first real run.
 
-**Bodies:** any LeRobot robot behind the same driver through one hardware-abstraction interface; bimanual skills after that.
+**Bodies:** any LeRobot robot behind the same driver through one hardware-abstraction interface — a UR5 already follows the SO-101 leader (a clutch, a workspace box, a dead-man) as a LeRobot robot, so a UR dataset records like an SO-101 one; bimanual skills after that.
 
 ---
 
