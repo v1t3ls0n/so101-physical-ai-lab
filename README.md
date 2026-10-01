@@ -214,7 +214,7 @@ Then the question of what a good reach looks like, measured on the recorded take
 | | Human takes | Policies that got stuck |
 |---|---|---|
 | ball kept in the wrist camera's view | 100 % of frames | 74 % |
-| ball's distance from the picture's middle | 0.29 | 0.47 |
+| ball's distance from the jaws' spot (where it sits when they close) | 0.21 | 0.55 |
 | weighted corrections a second on the way in (a joint going back against its own stroke) | 2.7–4.6 | 21–52 |
 
 Each joint's correction is weighted by how rarely people reverse it: on the way in a person moves the shoulder lift in one stroke and turns the wrist roll once, and aims with small corrections of the base, the elbow and the wrist. The ideal reach from above, solved by inverse kinematics from each take's own start to its own grasp, needs two corrections; people make about 11 with the leader arm, the stuck policies about 25. The leader is a clumsy hand, so the takes are now cleaned before training — every joint's command made monotone between the take's own key poses, its timing and the gripper's decisions kept — which cut the corrections from 16 to 7 per take while moving the commands only 2.3° on average. These signals now score every recorded take on the Record page, report a policy that gropes, and can shape the reward of RL on the arm and in the twin.
