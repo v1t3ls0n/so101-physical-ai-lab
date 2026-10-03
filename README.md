@@ -231,13 +231,23 @@ Each joint's correction is weighted by how rarely people reverse it: on the way 
 
 *Measured with nobody placing the ball (October 3).* An evaluation loop runs on its own: a scripted take grasps the ball and puts it down at a random spot on the pad (adding a take to the data as it goes), the scene camera checks the ball is there and has moved, the policy runs for 75 s, and the wrist camera scores the round: held when the ball stood between the jaws for 8 s in a row. Trained on 20 human takes plus 31 of the demonstrator's (with a 100 mm lift and put-downs spread over the pad), **the policy grasped and lifted the ball in 17 of 18 reachable placements**; with 45 scripted takes, 12 of 13 — more of the same data did not move the rate, though it shortened the holds. The loop stops itself when the ball rolls where nothing can reach it (the pad slopes toward the base), when a servo stops answering, or on an overload.
 
+🎓 **RL in the twin: a reach smoother than any demonstration (October 4).** The same shaped signals became the reward of a state-based task in the studio twin (Isaac Lab, PPO, 1024 environments on an RTX 2080): potentials for approaching, gripping and lifting, a reward for every second the ball is held, and charges for corrections and for excess joint travel. Nine runs learnt to reach and none to hold; what made it pick was jaws that latch open or shut (driven continuously they never closed on the ball), a reward per second held, and ignoring the last 2 cm of the approach's jitter. The policy picks 100 of 100 from the rest pose in 1.9 s median, and its approach by the takes' own measure:
+
+| Approach (medians) | Corrections | Weighted | Excess joint travel |
+|---|---:|---:|---:|
+| RL policy in the twin | 1 | 2.6 | 17° |
+| Human demonstrations (34) | 11 | 55 | 127° |
+| Ideal reach from above | 3 | 99 | — |
+
+It knows the ball's exact position and has two-state jaws; next it teaches a camera policy (its rollouts recorded as takes), and then the arm.
+
 *What the hardware taught on the way.* A policy that holds a ball keeps squeezing; after 50 s the gripper servo tripped its overload protection, and the run's end (back to the start pose, jaws shut) tripped it again in 3 s. The follower now caps a held squeeze and eases it after 4 s, and opens the jaws before going home. A scripted batch stopped by hand lost its kept takes (the dataset was finalised only on a normal exit); takes are now written first, and a repair tool renumbers a dataset with gaps. And the scene camera's mount was swinging with the arm's motion, a different framing from one take to the next; it is fixed down now.
 
 ---
 
 ## 🔭 Where it is going
 
-**In the twin next:** RL with the same shaped rewards (closing in, keeping the ball centred, few corrections), aiming at a reach cleaner than any demonstration, then distilled into a camera policy.
+**In the twin next:** the RL policy's reaches recorded as camera takes, a camera policy trained on them, then tried on the arm.
 
 **At the bench next:** a second round of the mixed policy — scripted takes with the ball near the pad's borders and a higher lift, then retrained; a fixed camera's pose solved from the jaws moving (no ball, no tags) and the wrist camera's from an AprilTag sheet, then the table placed from a wrist survey pose instead of a fixed camera's picture; a whole-task policy trained only on the scripted demonstrator's takes (held-out error 2.6° against 13.9° for the earlier model — on its own kind of takes, so the arm decides); crowded balls pushed apart inside their box before a grasp; every move checked by the event camera — did the arm go where it was told, and how long it took to start; the depth camera overhead and a 90°+120° stereo pair on the wrist (a printed mount, drafted); the first HIL-SERL session with a hand on the clutch.
 
