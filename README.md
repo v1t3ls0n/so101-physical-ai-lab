@@ -229,6 +229,8 @@ Each joint's correction is weighted by how rarely people reverse it: on the way 
 
 ![The mixed policy on the arm: scene camera left, wrist camera right, 4× speed](assets/first_grasp_mix.gif)
 
+*Measured with nobody placing the ball (October 3).* An evaluation loop runs on its own: a scripted take grasps the ball and puts it down at a random spot on the pad (adding a take to the data as it goes), the scene camera checks the ball is there and has moved, the policy runs for 75 s, and the wrist camera scores the round: held when the ball stood between the jaws for 8 s in a row. Trained on 20 human takes plus 31 of the demonstrator's (with a 100 mm lift and put-downs spread over the pad), **the policy grasped and lifted the ball in 17 of 18 reachable placements**; with 45 scripted takes, 12 of 13 — more of the same data did not move the rate, though it shortened the holds. The loop stops itself when the ball rolls where nothing can reach it (the pad slopes toward the base), when a servo stops answering, or on an overload.
+
 *What the hardware taught on the way.* A policy that holds a ball keeps squeezing; after 50 s the gripper servo tripped its overload protection, and the run's end (back to the start pose, jaws shut) tripped it again in 3 s. The follower now caps a held squeeze and eases it after 4 s, and opens the jaws before going home. A scripted batch stopped by hand lost its kept takes (the dataset was finalised only on a normal exit); takes are now written first, and a repair tool renumbers a dataset with gaps. And the scene camera's mount was swinging with the arm's motion, a different framing from one take to the next; it is fixed down now.
 
 ---
